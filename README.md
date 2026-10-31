@@ -1,3 +1,11 @@
+# GPT CVNSS4.0 — Vietnamese edition
+
+**[🇻🇳 Hướng dẫn tiếng Việt / Vietnamese guide](README_VI.md)** · **[Mở phòng thí nghiệm CVNSS4.0](docs/index.html)**
+
+> Nền tảng GPT Teacher nguyên bản được giữ lại để đối chiếu; các thí nghiệm tiếng Việt và CVNSS4.0 dùng cấu hình/dữ liệu riêng.
+
+---
+
 # GPT Teacher
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
