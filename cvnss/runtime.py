@@ -30,14 +30,14 @@ def convert(text: str, direction: str) -> str:
     return proc.stdout
 
 
-def answer(question: str, mode: str, max_new_tokens: int = 64, temperature: float = 0.0) -> dict[str, str]:
+def answer(question: str, mode: str, max_new_tokens: int = 64, temperature: float = 0.0, encoded_input: bool = False) -> dict[str, str]:
     if mode not in ("unicode", "cvnss"):
         raise ValueError("Chế độ không hợp lệ.")
     if not question.strip():
         raise ValueError("Vui lòng nhập câu hỏi.")
     from core.infer import generate
     model, tok, device, cfg = load(mode)
-    prompt = convert(question.strip(), "encode") if mode == "cvnss" else question.strip()
+    prompt = convert(question.strip(), "encode") if mode == "cvnss" and not encoded_input else question.strip()
     user_prefix = cfg["data"]["user_prefix"]
     assistant_prefix = cfg["data"]["assistant_prefix"]
     context = user_prefix + prompt + "\n" + assistant_prefix

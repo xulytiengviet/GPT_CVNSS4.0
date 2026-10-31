@@ -41,15 +41,10 @@ def evaluate(mode: str, limit: int | None = None, max_new_tokens: int = 64) -> d
     exact = 0
     for row in rows:
         prompt, target = row["prompt"], row["completion"]
-        # Tập CVNSS đã chuyển đổi; runtime.answer nhận đầu vào Unicode nên giải mã chuẩn tắc trước.
-        if mode == "cvnss":
-            from cvnss.runtime import convert
-            question = convert(prompt, "decode")
-            result = answer(question, mode, max_new_tokens=max_new_tokens)
-            predicted = result["raw"]
-        else:
-            result = answer(prompt, mode, max_new_tokens=max_new_tokens)
-            predicted = result["raw"]
+        # Tập CVNSS đã được mã hóa; đưa trực tiếp vào mô hình để tránh mất thông tin
+        # khi giải mã chuẩn tắc rồi mã hóa lại (không bảo đảm song ánh).
+        result = answer(prompt, mode, max_new_tokens=max_new_tokens, encoded_input=(mode == "cvnss"))
+        predicted = result["raw"]
         target_norm, pred_norm = normalize(target), normalize(predicted)
         ok = target_norm == pred_norm
         exact += int(ok)
