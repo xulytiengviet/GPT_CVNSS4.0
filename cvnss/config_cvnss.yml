@@ -1,0 +1,27 @@
+data:
+  train_path: cvnss/data/cvnss/train.jsonl
+  val_path: cvnss/data/cvnss/val.jsonl
+  test_path: cvnss/data/cvnss/test.jsonl
+  user_prefix: 'Người dùng:'
+  assistant_prefix: 'Trợ lý:'
+model:
+  dropout: 0.1
+  n_embd: 256
+  n_head: 4
+  n_kv_head: 2
+  n_layer: 4
+  seq_len: 128
+tokenizer:
+  type: hf_tokenizers
+  path: cvnss/tokenizer_cvnss.json
+training:
+  batch_size: 16
+  micro_batch: 4
+  eval_interval: 25
+  early_stopping_patience: 12
+  lr: 0.001
+  max_steps: 500
+  save_dir: cvnss/checkpoints/cvnss
+  seed: 42
+  warmup_steps: 30
+  weight_decay: 0.1
