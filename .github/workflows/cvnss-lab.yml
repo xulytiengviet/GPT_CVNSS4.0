@@ -48,3 +48,30 @@ jobs:
           test -f docs/assets/site.css
           test -f docs/assets/site.js
           test -f index.html
+
+  train-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      - name: Install Python 3.11 and dependencies
+        run: |
+          uv python install 3.11
+          uv sync --python 3.11
+      - name: Build both variants and train a short smoke checkpoint
+        run: |
+          uv run python -m cvnss.cli prepare --mode unicode
+          uv run python -m cvnss.cli prepare --mode cvnss
+          uv run python -m cvnss.cli tokenizer --mode unicode
+          uv run python -m cvnss.cli tokenizer --mode cvnss
+          uv run python -m cvnss.cli train --mode unicode --device cpu --max-steps 25
+          uv run python -m cvnss.cli evaluate --mode unicode
+          uv run python -m cvnss.cli train --mode cvnss --device cpu --max-steps 25
+          uv run python -m cvnss.cli evaluate --mode cvnss
+          test -f cvnss/checkpoints/unicode/best.pt
+          test -f cvnss/checkpoints/cvnss/best.pt
+          test -f cvnss/checkpoints/unicode/metrics.json
+          test -f cvnss/checkpoints/cvnss/metrics.json
