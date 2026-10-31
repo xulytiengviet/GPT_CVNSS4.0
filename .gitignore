@@ -58,3 +58,8 @@ logs/
 flagged/
 .claude/
 .mcp.json
+
+# GPT CVNSS4.0 generated artifacts
+cvnss/data/
+cvnss/checkpoints/
+cvnss/tokenizer_*.json
