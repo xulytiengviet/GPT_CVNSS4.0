@@ -246,7 +246,7 @@ def generate(
     model.eval()
     assert tok.bos_id is not None and tok.eos_id is not None, "分词器缺少 BOS/EOS 特殊 token"
     # normalize prompt: collapse or remove spaces commonly inserted in Chinese
-    norm = prompt.replace(" ", "").replace("　", "")
+    norm = prompt.replace(" ", "").replace("　", "") if wrap_prompt else prompt
     # wrap_prompt=False：prompt 已是完整对话文本（多轮拼接），不再包 "用户:\n助手:"
     text = "用户:" + norm + "\n助手:" if wrap_prompt else norm
     # 手动添加 BOS，不添加 EOS
