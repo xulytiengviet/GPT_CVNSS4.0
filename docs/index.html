@@ -11,7 +11,7 @@ uv run python -m cvnss.cli tokenizer --mode cvnss
 uv run python -m cvnss.cli train --mode unicode --device cpu
 uv run python -m cvnss.cli infer --mode unicode --prompt "Xin chào!"</pre><p>Thay <code>unicode</code> bằng <code>cvnss</code> để chạy thí nghiệm tương ứng. Tập 50 cặp có sẵn chỉ là dữ liệu khởi động, không đủ đánh giá chất lượng chatbot.</p></section>
 <section class="card"><h2>4. Giới hạn và nguồn gốc</h2><p>Thay đổi tokenizer làm checkpoint tiếng Trung cũ không tương thích. Số tham số thực tế có thể thay đổi theo kích thước vocab; mô hình nhỏ không tương đương LLM hiện đại.</p><p><a href="https://github.com/xulytiengviet/GPT_CVNSS4.0">Dự án GPT CVNSS4.0</a> · <a href="https://github.com/helloworldtang/GPT_teacher-3.37M-cn">Mã nguồn GPT Teacher gốc</a></p></section></main><footer>GPT CVNSS4.0 · Nền tảng nghiên cứu và giáo dục</footer>
-<script src="../cvnss/vendor/converter.js"></script><script>
+<script src="./vendor/converter.js"></script><script>
 function update(){const c=globalThis.CVNSSConverter;if(!c){document.querySelector("#notice").textContent="Không tải được converter.js. Hãy sử dụng GitHub Pages hoặc HTTP server ở thư mục gốc.";return;}const input=document.querySelector("#source").value;const code=c.fromCqn(input).cvss;document.querySelector("#encoded").textContent=code;document.querySelector("#decoded").textContent=c.fromCvss(code).cqn;}
 document.querySelector("#convert").addEventListener("click",update);update();
 </script></body></html>
