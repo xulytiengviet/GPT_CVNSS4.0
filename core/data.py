@@ -26,7 +26,14 @@ class InstructDataset(Dataset[Sample]):
         seq_len: 最大序列长度。
     """
 
-    def __init__(self, path: str, tokenizer: TokenizerLike, seq_len: int, user_prefix: str = "用户:", assistant_prefix: str = "助手:") -> None:
+    def __init__(
+        self,
+        path: str,
+        tokenizer: TokenizerLike,
+        seq_len: int,
+        user_prefix: str = "用户:",
+        assistant_prefix: str = "助手:",
+    ) -> None:
         """从 jsonl 文件加载数据并编码。
 
         Args:
@@ -45,7 +52,8 @@ class InstructDataset(Dataset[Sample]):
                 obj = json.loads(line)
                 prompt = obj.get("prompt", "")
                 completion = obj.get("completion", "")
-                prefix = [self.tok.bos_id, *self.tok.encode(self.user_prefix + prompt + "\n" + self.assistant_prefix, add_special_tokens=False)]
+                question = self.user_prefix + prompt + "\n" + self.assistant_prefix
+                prefix = [self.tok.bos_id, *self.tok.encode(question, add_special_tokens=False)]
                 comp = self.tok.encode(completion, add_special_tokens=False)
                 ids = prefix + comp + [self.tok.eos_id]
 

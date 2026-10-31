@@ -30,7 +30,7 @@ def _git_hash() -> str | None:
 
 
 def build_fingerprint(cfg: dict[str, Any]) -> dict[str, Any]:
-    """构建 checkpoint 版本指纹：代码/数据/分词器的版本坐标。
+    """构建 checkpoint Dấu vân tay phiên bản：代码/数据/分词器的版本坐标。
 
     tokenizer、数据与模型权重必须配套演进（词表变化会使旧权重静默失效），
     指纹让每个 checkpoint 自带完整来源信息，支持审计与复算。
@@ -79,25 +79,25 @@ def get_device(want: str | None = None) -> torch.device:
     if want is None or want == "auto":
         # 优先级: CUDA > MPS > CPU
         if torch.cuda.is_available():
-            print("🚀 使用CUDA GPU加速训练")
+            print("🚀 Đang dùng GPU CUDA để huấn luyện")
             return torch.device("cuda")
         if torch.backends.mps.is_available():
-            print("🍎 使用Apple Neural Engine (MPS)加速训练")
+            print("🍎 Đang dùng MPS để huấn luyện")
             return torch.device("mps")
-        print("🖥️ 使用CPU训练（未检测到GPU/MPS）")
+        print("🖥️ Đang dùng CPU (không phát hiện GPU/MPS)")
         return torch.device("cpu")
     if want == "cpu":
-        print("🖥️ 强制使用CPU训练")
+        print("🖥️ Đã chọn huấn luyện bằng CPU")
         return torch.device("cpu")
     if want == "cuda":
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA不可用，但指定了--device cuda")
-        print("🚀 使用CUDA GPU加速训练")
+        print("🚀 Đang dùng GPU CUDA để huấn luyện")
         return torch.device("cuda")
     if want == "mps":
         if not torch.backends.mps.is_available():
             raise RuntimeError("MPS不可用，但指定了--device mps")
-        print("🍎 使用Apple Neural Engine (MPS)加速训练")
+        print("🍎 Đang dùng MPS để huấn luyện")
         return torch.device("mps")
     raise RuntimeError(f"Unknown device option: {want}. Available options: auto, cpu, cuda, mps")
 
@@ -119,7 +119,7 @@ def plot_loss_curve(train_losses: list[float], val_losses: list[float], eval_int
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except ImportError:
-        print("  提示: 安装 matplotlib 可生成 loss 曲线图 (pip install matplotlib)")
+        print("  Gợi ý: cài matplotlib để vẽ đường loss (pip install matplotlib)")
         return
 
     fig, ax = plt.subplots(figsize=(8, 4))
@@ -139,7 +139,7 @@ def plot_loss_curve(train_losses: list[float], val_losses: list[float], eval_int
     plt.tight_layout()
     plt.savefig(save_path, dpi=150)
     plt.close()
-    print(f"  Loss 曲线已保存: {save_path}")
+    print(f"  Đã lưu đồ thị loss: {save_path}")
 
 
 def evaluate(model: GPT, loader: DataLoader[Any], loss_fn: nn.Module, device: torch.device) -> float:
@@ -194,7 +194,7 @@ def train(
         config_path = "train/config.yml"
     cfg = load_config(config_path)
     fp = build_fingerprint(cfg)
-    print(f"版本指纹: git={fp['git']} data={fp['train_data_md5']} tokenizer={fp['tokenizer_md5']}")
+    print(f"Dấu vân tay phiên bản: git={fp['git']} data={fp['train_data_md5']} tokenizer={fp['tokenizer_md5']}")
     set_seed(cfg["training"]["seed"])
     torch.set_num_threads(num_threads())
     tok, train_ds, val_ds = build_datasets(cfg)
@@ -213,8 +213,8 @@ def train(
     model.to(device)
 
     total_params = sum(p.numel() for p in model.parameters())
-    print(f"模型参数量: {total_params:,} ({total_params / 1e6:.2f}M)")
-    print(f"设备: {device} | 序列长度: {seq_len} | 训练集: {len(train_ds)} 条")
+    print(f"Số tham số mô hình: {total_params:,} ({total_params / 1e6:.2f}M)")
+    print(f"Thiết bị: {device} | Độ dài chuỗi: {seq_len} | Tập huấn luyện: {len(train_ds)} 条")
     print(f"{'=' * 50}")
 
     assert tok.pad_id is not None, "分词器缺少 PAD 特殊 token"
@@ -272,7 +272,7 @@ def train(
 
         pbar = tqdm(
             total=total_steps,
-            desc="训练",
+            desc="Huấn luyện",
             unit="step",
             bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] loss={postfix}",
         )
@@ -330,25 +330,25 @@ def train(
                         patience_counter = 0
                         save_ckpt("best.pt")
                         if use_tqdm:
-                            pbar.write(f"  → 新的最佳模型保存 (step {step})")
+                            pbar.write(f"  → Đã lưu checkpoint tốt nhất (step {step})")
                         else:
-                            print(f"  → 新的最佳模型保存 (step {step})")
+                            print(f"  → Đã lưu checkpoint tốt nhất (step {step})")
                     else:
                         patience_counter += 1
-                        msg = f"  → 验证损失未改善 ({patience_counter}/{early_stopping_patience})"
+                        msg = f"  → Validation loss chưa cải thiện ({patience_counter}/{early_stopping_patience})"
                         if use_tqdm:
                             pbar.write(msg)
                         else:
                             print(msg)
                         if patience_counter >= early_stopping_patience:
                             if use_tqdm:
-                                pbar.write(f"\n=== 早停触发 (step {step}) ===")
-                                pbar.write(f"最佳验证损失: {best_val_loss:.4f} (step {best_step})")
-                                pbar.write(f"总训练时间: {elapsed:.1f}s")
+                                pbar.write(f"\n=== Kích hoạt dừng sớm (step {step}) ===")
+                                pbar.write(f"Validation loss tốt nhất: {best_val_loss:.4f} (step {best_step})")
+                                pbar.write(f"Tổng thời gian huấn luyện: {elapsed:.1f}s")
                             else:
-                                print(f"\n=== 早停触发 (step {step}) ===")
-                                print(f"最佳验证损失: {best_val_loss:.4f} (step {best_step})")
-                                print(f"总训练时间: {elapsed:.1f}s")
+                                print(f"\n=== Kích hoạt dừng sớm (step {step}) ===")
+                                print(f"Validation loss tốt nhất: {best_val_loss:.4f} (step {best_step})")
+                                print(f"Tổng thời gian huấn luyện: {elapsed:.1f}s")
                             early_stop_triggered = True
 
                     save_ckpt("last.pt")
@@ -365,8 +365,8 @@ def train(
     total_elapsed = time.time() - start_time
 
     print(f"\n{'=' * 50}")
-    print(f"✓ 训练完成，总用时: {total_elapsed:.1f}s ({total_elapsed / 60:.1f}min)")
-    print(f"  最佳验证损失: {best_val_loss:.4f} (step {best_step})")
+    print(f"✓ Huấn luyện hoàn tất, tổng thời gian: {total_elapsed:.1f}s ({total_elapsed / 60:.1f}min)")
+    print(f"  Validation loss tốt nhất: {best_val_loss:.4f} (step {best_step})")
 
     # 保存 loss 曲线
     loss_curve_path = os.path.join(save_dir, "loss_curve.png")
@@ -391,16 +391,16 @@ def train(
                 {"model": quantized.state_dict(), "cfg": cfg},
                 os.path.join(save_dir, "quantized.pt"),
             )
-            print("  量化模型已保存: train/checkpoints/quantized.pt")
+            print("  Đã lưu mô hình lượng tử hóa: train/checkpoints/quantized.pt")
         except Exception as e:
-            print(f"  量化导出跳过（--quantize 已开启，但当前平台无动态量化引擎: {e}）")
+            print(f"  Bỏ qua xuất bản lượng tử hóa（--quantize đã bật nhưng thiết bị không hỗ trợ: {e}）")
 
     # 自动运行验收测试
     if not acceptance:
-        print("\n已跳过自动验收（--no-acceptance）")
+        print("\nĐã bỏ qua kiểm tra nghiệm thu tự động（--no-acceptance）")
         return
     print(f"\n{'=' * 50}")
-    print("开始验收测试...")
+    print("Bắt đầu kiểm tra nghiệm thu...")
     print(f"{'=' * 50}")
     try:
         from core.evaluate import run_test
@@ -420,8 +420,8 @@ def train(
     except SystemExit:
         raise
     except Exception as e:
-        print(f"验收测试执行出错: {e}")
-        print("可手动运行: uv run python -m core.evaluate")
+        print(f"Kiểm tra nghiệm thu thất bại: {e}")
+        print("Có thể chạy thủ công: uv run python -m core.evaluate")
         raise SystemExit(1) from e
 
 
@@ -434,7 +434,7 @@ def main() -> None:
         type=str,
         default="auto",
         choices=["auto", "cpu", "cuda", "mps"],
-        help="训练设备: auto(自动检测), cpu, cuda(GPU), mps(Apple M芯片)",
+        help="训练Thiết bị: auto(自动检测), cpu, cuda(GPU), mps(Apple M芯片)",
     )
     ap.add_argument("--no-flash", action="store_true", help="禁用 Flash Attention")
     ap.add_argument("--quantize", action="store_true", help="额外导出 int8 动态量化模型（macOS 不支持）")

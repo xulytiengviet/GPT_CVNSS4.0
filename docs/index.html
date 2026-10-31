@@ -1,17 +1,135 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GPT CVNSS4.0 | Phòng thí nghiệm tiếng Việt</title><style>
-*{box-sizing:border-box}body{margin:0;font:16px/1.65 system-ui,sans-serif;color:#192640;background:#f3f6fb}header{background:linear-gradient(120deg,#102048,#2857a5);color:#fff;padding:58px max(22px,calc((100% - 1060px)/2))}h1{font-size:clamp(34px,5vw,56px);line-height:1.15;margin:12px 0}header p{max-width:770px;color:#dae7ff}main{max-width:1080px;margin:24px auto;padding:0 18px;display:grid;gap:20px}.card{background:#fff;border:1px solid #dce5f2;border-radius:18px;padding:25px;box-shadow:0 3px 12px #273a5410}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.tile{background:#f0f5fd;padding:16px;border-radius:12px}.tile strong{color:#174ba1}.badge{display:inline-block;margin:5px 6px 5px 0;padding:6px 11px;border-radius:50px;background:#dce8ff;color:#173d82;font-weight:600}textarea{width:100%;height:110px;border:1px solid #bbc9dd;padding:14px;border-radius:12px;font:inherit}button{background:#245bb6;border:0;border-radius:10px;color:white;font-weight:700;padding:12px 20px;cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#12213a;color:#e8efff;padding:17px;border-radius:10px}small{color:#5d6b81}a{color:#245bb6}footer{text-align:center;padding:25px;color:#728096}</style></head><body>
-<header><div>PHÒNG THÍ NGHIỆM GIÁO DỤC • TIẾNG VIỆT • CVNSS4.0</div><h1>GPT CVNSS4.0</h1><p>Khung huấn luyện GPT nhỏ, Việt hóa quy trình từ dữ liệu Quốc ngữ đến tokenizer, Transformer và suy luận bằng CVNSS4.0.</p><span class="badge">GPT Decoder-only</span><span class="badge">ByteLevel BPE</span><span class="badge">Converter audit-safe v5</span><span class="badge">CPU / CUDA / MPS</span></header>
-<main><section class="card"><h2>1. Quy trình huấn luyện</h2><div class="grid"><div class="tile"><strong>01 · Thu thập</strong><p>Dữ liệu tiếng Việt chuẩn NFC, cặp câu hỏi–trả lời JSONL.</p></div><div class="tile"><strong>02 · Biểu diễn</strong><p>Chữ Quốc ngữ hoặc CVNSS4.0 từ bộ quy tắc v5.</p></div><div class="tile"><strong>03 · Tokenizer</strong><p>Tạo ByteLevel BPE mới từ tập train.</p></div><div class="tile"><strong>04 · GPT</strong><p>Transformer tự hồi quy bốn lớp, huấn luyện riêng từng chế độ.</p></div><div class="tile"><strong>05 · Đánh giá</strong><p>Theo dõi validation loss và kiểm tra trên tập holdout.</p></div><div class="tile"><strong>06 · Suy luận</strong><p>Tải checkpoint thật và sinh token trên máy huấn luyện.</p></div></div></section>
-<section class="card"><h2>2. Chuyển đổi trực tiếp: Quốc ngữ ↔ CVNSS4.0</h2><p><small>Demo này chạy bộ chuyển đổi quy tắc trên trình duyệt, không mô phỏng GPT đã được huấn luyện.</small></p><label for="source">Văn bản chữ Quốc ngữ</label><textarea id="source">Xin chào Việt Nam. Tôi đang nghiên cứu GPT CVNSS4.0.</textarea><p><button id="convert">Chuyển đổi văn bản</button></p><div class="grid"><div><h3>CVNSS4.0</h3><pre id="encoded">...</pre></div><div><h3>Giải mã chuẩn tắc</h3><pre id="decoded">...</pre></div></div><p id="notice"><small>Bộ giải mã có những trường hợp nhập nhằng, không cam kết lossless tuyệt đối.</small></p></section>
-<section class="card"><h2>3. Huấn luyện trên máy cá nhân</h2><pre>uv sync
-uv run python -m cvnss.cli prepare --mode unicode
-uv run python -m cvnss.cli prepare --mode cvnss
-uv run python -m cvnss.cli tokenizer --mode unicode
-uv run python -m cvnss.cli tokenizer --mode cvnss
-uv run python -m cvnss.cli train --mode unicode --device cpu
-uv run python -m cvnss.cli infer --mode unicode --prompt "Xin chào!"</pre><p>Thay <code>unicode</code> bằng <code>cvnss</code> để chạy thí nghiệm tương ứng. Tập 50 cặp có sẵn chỉ là dữ liệu khởi động, không đủ đánh giá chất lượng chatbot.</p></section>
-<section class="card"><h2>4. Giới hạn và nguồn gốc</h2><p>Thay đổi tokenizer làm checkpoint tiếng Trung cũ không tương thích. Số tham số thực tế có thể thay đổi theo kích thước vocab; mô hình nhỏ không tương đương LLM hiện đại.</p><p><a href="https://github.com/xulytiengviet/GPT_CVNSS4.0">Dự án GPT CVNSS4.0</a> · <a href="https://github.com/helloworldtang/GPT_teacher-3.37M-cn">Mã nguồn GPT Teacher gốc</a></p></section></main><footer>GPT CVNSS4.0 · Nền tảng nghiên cứu và giáo dục</footer>
-<script src="./vendor/converter.js"></script><script>
-function update(){const c=globalThis.CVNSSConverter;if(!c){document.querySelector("#notice").textContent="Không tải được converter.js. Hãy sử dụng GitHub Pages hoặc HTTP server ở thư mục gốc.";return;}const input=document.querySelector("#source").value;const code=c.fromCqn(input).cvss;document.querySelector("#encoded").textContent=code;document.querySelector("#decoded").textContent=c.fromCvss(code).cqn;}
-document.querySelector("#convert").addEventListener("click",update);update();
-</script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GPT CVNSS4.0: phòng thí nghiệm GPT tiếng Việt, bộ chuyển đổi chữ Quốc ngữ, tokenizer BPE, huấn luyện Transformer và đánh giá mô hình.">
+  <meta name="theme-color" content="#101d37">
+  <title>GPT CVNSS4.0 — Phòng thí nghiệm GPT tiếng Việt</title>
+  <link rel="stylesheet" href="./assets/site.css">
+</head>
+<body>
+  <a class="skip" href="#content">Chuyển tới nội dung</a>
+  <header class="site-head">
+    <nav class="nav wrap" aria-label="Điều hướng chính">
+      <a class="brand" href="#home"><span class="brand-mark">G<span>4</span></span><span>GPT <strong>CVNSS4.0</strong><small>VIETNAMESE AI LAB</small></span></a>
+      <div class="nav-links">
+        <a href="#quy-trinh">Quy trình</a><a href="#chuyen-doi">Chuyển đổi</a><a href="#du-lieu">Dữ liệu</a><a href="#huan-luyen">Huấn luyện</a><a href="#danh-gia">Đánh giá</a>
+      </div>
+      <a class="nav-github" href="https://github.com/xulytiengviet/GPT_CVNSS4.0" target="_blank" rel="noopener noreferrer">Mã nguồn <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+  <main id="content">
+    <section class="hero" id="home">
+      <div class="hero-glow"></div>
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> MÃ NGUỒN MỞ · VIỆT HÓA · NGHIÊN CỨU</div>
+          <h1>Huấn luyện một <em>GPT tiếng Việt</em> từ những bước đầu tiên.</h1>
+          <p class="lede">Khám phá dữ liệu chữ Quốc ngữ, CVNSS4.0, tokenizer BPE và Transformer. Quan sát từng khâu, chạy mô hình trên máy của bạn và so sánh hai cách biểu diễn ngôn ngữ.</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="#chuyen-doi">Thử chuyển đổi <span aria-hidden="true">→</span></a><a class="btn btn-outline" href="#huan-luyen">Xem hướng dẫn huấn luyện</a></div>
+          <div class="hero-note">Trang web là phòng thí nghiệm <strong>tĩnh</strong>. Chuyển đổi văn bản hoạt động ngay; mô hình GPT cần được huấn luyện và chạy riêng.</div>
+        </div>
+        <div class="hero-diagram" aria-label="Kiến trúc hai nhánh dữ liệu và huấn luyện GPT">
+          <div class="diagram-label">DÒNG XỬ LÝ NGÔN NGỮ</div>
+          <div class="diagram-box input-box"><span>01 / NGUỒN</span><strong>Dữ liệu tiếng Việt Unicode</strong><small>prompt · completion · chuẩn NFC</small></div>
+          <div class="diagram-branch"><span></span><b>↓</b><span></span></div>
+          <div class="diagram-duo">
+            <div class="diagram-box"><span>NHÁNH A</span><strong>Quốc ngữ</strong><small>ByteLevel BPE</small></div>
+            <div class="diagram-box accent"><span>NHÁNH B</span><strong>CVNSS4.0</strong><small>Converter v5 → BPE</small></div>
+          </div>
+          <div class="diagram-bottom">↓ &nbsp; Mô hình GPT riêng &nbsp; ↓</div>
+          <div class="diagram-box output-box"><span>ĐÁNH GIÁ</span><strong>Checkpoint · Suy luận · CER</strong><small>So sánh trên tập kiểm tra độc lập</small></div>
+          <div class="diagram-footer"><span>4 lớp Transformer</span><span>CPU / CUDA / MPS</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="stats-wrap"><div class="wrap stats">
+      <div><span class="stat-number">02</span><span>Chế độ biểu diễn</span></div>
+      <div><span class="stat-number">06</span><span>Công đoạn huấn luyện</span></div>
+      <div><span class="stat-number" id="audit-count">56</span><span>Nhóm nhập nhằng cần lưu ý</span></div>
+      <div><span class="stat-number">50</span><span>Cặp Q&amp;A mẫu khởi động</span></div>
+    </div></section>
+
+    <section id="quy-trinh" class="section wrap">
+      <div class="section-heading"><span class="section-id">01 — LỘ TRÌNH</span><h2>Hiểu toàn bộ quy trình GPT</h2><p>Từng bước đều có mục đích, dữ liệu vào, sản phẩm đầu ra và câu lệnh tương ứng. Không dùng mô hình tiếng Trung với tokenizer mới.</p></div>
+      <div class="steps">
+        <article><span class="step-index">01</span><h3>Chuẩn bị dữ liệu</h3><p>Chuyển văn bản/câu hỏi–trả lời thành JSONL, chuẩn hóa NFC và chia train, validation, test.</p><code>prepare.py</code></article>
+        <article><span class="step-index">02</span><h3>Chọn biểu diễn</h3><p>Giữ nguyên chữ Quốc ngữ hoặc mã hóa bằng converter CVNSS4.0 audit-safe.</p><code>convert.js</code></article>
+        <article><span class="step-index">03</span><h3>Tạo tokenizer</h3><p>Học từ vựng ByteLevel BPE mới chỉ từ tập train, mỗi chế độ một tokenizer.</p><code>tokenizer.py</code></article>
+        <article><span class="step-index">04</span><h3>Huấn luyện GPT</h3><p>Mô hình Decoder-only Transformer học dự đoán câu trả lời, theo dõi validation loss.</p><code>train.train</code></article>
+        <article><span class="step-index">05</span><h3>Đánh giá</h3><p>Đo Exact Match và CER trên tập test chưa dùng để cập nhật trọng số.</p><code>cvnss.evaluate</code></article>
+        <article><span class="step-index">06</span><h3>Suy luận và đối chứng</h3><p>Tải best.pt thực tế, sinh câu trả lời; riêng CVNSS4.0 có thể giải mã về Unicode.</p><code>cvnss.web_demo</code></article>
+      </div>
+      <div class="info-line"><strong>Giới hạn:</strong> mô hình gốc có quy mô khoảng 3,37 triệu tham số; kích thước thực của thí nghiệm mới phụ thuộc tokenizer và cấu hình. Bộ mẫu 50 câu chỉ kiểm tra đường ống, không chứng minh năng lực hội thoại.</div>
+    </section>
+
+    <section id="chuyen-doi" class="section section-alt">
+      <div class="wrap">
+        <div class="section-heading"><span class="section-id">02 — PHÒNG THỰC HÀNH</span><h2>Chữ Quốc ngữ ↔ CVNSS4.0</h2><p>Bộ chuyển đổi v5.0.0-audit-safe chạy ngay trong trình duyệt. Thực hành bằng quy tắc thật, không yêu cầu tài khoản hoặc API.</p></div>
+        <div class="workbench">
+          <div class="work-head"><div class="work-tabs"><button type="button" class="work-tab active" id="tab-cqn" aria-pressed="true">Quốc ngữ → CVNSS4.0</button><button type="button" class="work-tab" id="tab-cvss" aria-pressed="false">CVNSS4.0 → Quốc ngữ</button></div><span class="local-chip">Chạy trong trình duyệt</span></div>
+          <div class="work-body">
+            <label for="input-text" id="input-label">Văn bản chữ Quốc ngữ</label>
+            <textarea id="input-text" rows="5" spellcheck="false">Xin chào Việt Nam. Tôi đang học mô hình GPT và CVNSS4.0.</textarea>
+            <div class="bench-tools"><button id="convert-btn" class="btn btn-primary" type="button">Chuyển đổi <span aria-hidden="true">→</span></button><button id="reset-btn" class="btn btn-subtle" type="button">Dùng câu ví dụ</button><span class="instant-status" id="converter-status" role="status">Đang kiểm tra converter...</span></div>
+            <div class="results">
+              <div class="result-panel"><div class="panel-label"><span id="output-title">Kết quả CVNSS4.0</span><button class="copy-btn" type="button" data-copy="output-code">Sao chép</button></div><pre id="output-code" aria-live="polite"></pre></div>
+              <div class="result-panel"><div class="panel-label"><span id="reverse-title">Giải mã chuẩn tắc</span><button class="copy-btn" type="button" data-copy="reverse-code">Sao chép</button></div><pre id="reverse-code" aria-live="polite"></pre></div>
+            </div>
+            <div class="mini-metrics"><span>Unicode: <b id="source-chars">—</b> ký tự</span><span>Đầu ra: <b id="output-chars">—</b> ký tự</span><span>UTF-8 đầu ra: <b id="output-bytes">—</b> byte</span></div>
+            <div class="ambiguous" id="ambiguous">Lưu ý: một số mã CVNSS4.0 có nhiều cách khôi phục. Bản giải mã mặc định dùng ứng viên chuẩn tắc.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="du-lieu" class="section wrap">
+      <div class="section-heading"><span class="section-id">03 — DỮ LIỆU HUẤN LUYỆN</span><h2>Tạo mẫu JSONL tiếng Việt</h2><p>Nhập một cặp câu hỏi–trả lời để xem cấu trúc dữ liệu đầu vào. Mỗi dòng JSONL là một đối tượng với hai trường <code>prompt</code> và <code>completion</code>.</p></div>
+      <div class="two-col">
+        <div class="form-card">
+          <label for="example-prompt">Câu hỏi (prompt)</label><textarea id="example-prompt" rows="3">Thủ đô của Việt Nam là gì?</textarea>
+          <label for="example-completion">Câu trả lời (completion)</label><textarea id="example-completion" rows="3">Hà Nội là thủ đô của Việt Nam.</textarea>
+          <div class="form-actions"><button class="btn btn-primary" id="make-jsonl" type="button">Tạo mẫu JSONL</button><button class="btn btn-subtle" id="download-jsonl" type="button">Tải mẫu .jsonl</button></div>
+          <small>Chỉ tạo mẫu ở trình duyệt; không tự động thêm vào kho dữ liệu huấn luyện trên GitHub.</small>
+        </div>
+        <div class="code-card"><div class="code-title">TẬP UNICODE <button type="button" class="copy-btn" data-copy="jsonl-cqn">Sao chép</button></div><pre id="jsonl-cqn"></pre><div class="code-title">TẬP CVNSS4.0 <button type="button" class="copy-btn" data-copy="jsonl-cvnss">Sao chép</button></div><pre id="jsonl-cvnss"></pre></div>
+      </div>
+      <div class="data-notes"><div><b>Train · 80%</b><span>Học trọng số và tokenizer</span></div><div><b>Validation · 10%</b><span>Theo dõi loss, lựa chọn checkpoint</span></div><div><b>Test · 10%</b><span>Đánh giá độc lập sau huấn luyện</span></div></div>
+    </section>
+
+    <section id="huan-luyen" class="section section-alt">
+      <div class="wrap">
+        <div class="section-heading"><span class="section-id">04 — THỰC HIỆN TRÊN MÁY</span><h2>Chạy huấn luyện GPT trên Windows / Linux</h2><p>Trang GitHub Pages không có GPU/PyTorch server. Các lệnh sau chạy trên máy của bạn (Python 3.10–3.12, Node.js và uv).</p></div>
+        <div class="training-layout">
+          <div class="train-left">
+            <label for="training-mode">Chế độ thí nghiệm</label><select id="training-mode"><option value="unicode">Chữ Quốc ngữ (Unicode)</option><option value="cvnss">CVNSS4.0</option></select>
+            <label for="device">Thiết bị</label><select id="device"><option value="cpu">CPU (tương thích phổ biến)</option><option value="auto">Tự phát hiện GPU/CPU</option><option value="cuda">CUDA — NVIDIA</option><option value="mps">MPS — Apple Silicon</option></select>
+            <label for="vocab-size">Mục tiêu kích thước BPE</label><select id="vocab-size"><option value="2048">2.048 — thí nghiệm nhỏ</option><option value="4096">4.096</option><option value="8000">8.000</option><option value="16000">16.000</option></select>
+            <div class="training-note"><b>Quan trọng</b><p>Tokenizer mới phải đi cùng checkpoint mới. Không dùng lại <code>best.pt</code> của mô hình tiếng Trung.</p></div>
+          </div>
+          <div class="train-right"><div class="terminal-top"><span class="lights"><i></i><i></i><i></i></span> PowerShell / Terminal <button type="button" class="copy-btn" data-copy="train-commands">Sao chép lệnh</button></div><pre id="train-commands"></pre><p class="terminal-caption">Số bước mặc định 500; tăng dữ liệu và thời lượng huấn luyện nếu muốn nghiên cứu chất lượng mô hình. Để chạy website hỏi đáp local: <code>web-local</code>.</p></div>
+        </div>
+        <div class="two-col run-panels">
+          <div class="micro-card"><span class="micro-icon">◎</span><h3>Web hỏi đáp mô hình thật</h3><p>Sau khi huấn luyện tạo <code>best.pt</code>, Gradio tải trọng số trên máy cá nhân và sinh phản hồi từ GPT.</p><code>uv run python -m cvnss.cli web-local --mode unicode</code><small>Truy cập http://127.0.0.1:7861</small></div>
+          <div class="micro-card"><span class="micro-icon">◇</span><h3>Website GitHub Pages</h3><p>Trình bày quy trình, dữ liệu và chuyển đổi CVNSS4.0 mà không yêu cầu máy chủ AI.</p><code>uv run python -m cvnss.cli web</code><small>Truy cập http://127.0.0.1:7860/docs/</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="danh-gia" class="section wrap">
+      <div class="section-heading"><span class="section-id">05 — KIỂM CHỨNG</span><h2>Đọc kết quả huấn luyện có thật</h2><p>Chạy <code>evaluate</code> để sinh <code>metrics.json</code>. Bạn có thể chọn tệp từ máy để xem chỉ số, hoặc nạp <code>loss_history.json</code> để vẽ quá trình học. Tệp được xử lý cục bộ trên trình duyệt, không tải lên máy chủ.</p></div>
+      <div class="evaluation-grid">
+        <div class="eval-card"><h3>Tổng hợp kiểm tra</h3><label class="file-picker">Chọn metrics.json <input id="metrics-file" type="file" accept=".json,application/json"></label><p class="placeholder" id="metrics-message">Chưa nạp kết quả. Không có số liệu huấn luyện giả lập.</p><div class="metric-boxes"><div><span>Exact Match</span><strong id="metric-em">—</strong></div><div><span>CER (tỷ lệ lỗi ký tự)</span><strong id="metric-cer">—</strong></div><div><span>Số câu đánh giá</span><strong id="metric-samples">—</strong></div><div><span>Tham số thực</span><strong id="metric-params">—</strong></div></div></div>
+        <div class="eval-card"><h3>Đồ thị loss</h3><label class="file-picker">Chọn loss_history.json <input id="loss-file" type="file" accept=".json,application/json"></label><canvas id="loss-chart" width="560" height="250" role="img" aria-label="Biểu đồ train loss và validation loss từ tệp người dùng chọn"></canvas><p class="placeholder" id="loss-message">Chưa có dữ liệu để hiển thị đường loss.</p></div>
+      </div>
+      <div class="info-line"><strong>Giải thích:</strong> Exact Match yêu cầu chuỗi dự đoán khớp chuỗi kỳ vọng sau chuẩn hóa khoảng trắng; CER được tính bằng khoảng cách chỉnh sửa ký tự chia tổng ký tự tham chiếu. Các chỉ số này chưa đo được mức độ hiểu nghĩa hoặc khả năng suy luận tổng quát.</div>
+    </section>
+
+    <section class="section final-section"><div class="wrap final-grid"><div><span class="section-id">06 — TÀI LIỆU &amp; GIỚI HẠN</span><h2>Học mô hình, không chỉ xem giao diện.</h2><p>Dữ liệu huấn luyện sạch, phép chia độc lập, tokenizer nhất quán và checkpoint có thể kiểm tra quan trọng hơn việc một demo trông giống chatbot. CVNSS4.0 có các mã nhập nhằng; giải mã chuẩn tắc không đảm bảo phục hồi toàn bộ văn bản gốc.</p></div><div class="resource-links"><a href="https://github.com/xulytiengviet/GPT_CVNSS4.0" target="_blank" rel="noopener noreferrer"><span>Repository GPT CVNSS4.0</span> ↗</a><a href="https://github.com/xulytiengviet/GPT_CVNSS4.0/blob/main/README_VI.md" target="_blank" rel="noopener noreferrer"><span>Hướng dẫn tiếng Việt</span> ↗</a><a href="https://github.com/helloworldtang/GPT_teacher-3.37M-cn" target="_blank" rel="noopener noreferrer"><span>GPT Teacher 3.37M gốc</span> ↗</a></div></div></section>
+  </main>
+  <footer><div class="wrap foot"><span>GPT CVNSS4.0 · Phòng thí nghiệm nghiên cứu, giáo dục</span><span>Kế thừa GPT Teacher · Bộ chuyển đổi CVNSS4.0 v5 audit-safe</span></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./vendor/converter.js"></script><script src="./assets/site.js" defer></script>
+</body>
+</html>
